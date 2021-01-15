@@ -29,16 +29,6 @@ void interactions::askForTarget() {
 
 }
 
-int interactions::countTarget() {
-	int x = 0;
-	for (int f = 0; f < 8; f++) {
-		for (int r = 0; r < 8; r++) {
-			//if (b.cBoard[f][r].target)x++;
-		}
-	}
-	return x;
-}
-
 void interactions::calcTargets() {
 	for (int f = 0; f < 8; f++) {
 		for (int r = 0; r < 8; r++) {
@@ -68,32 +58,153 @@ void interactions::calcTargets() {
 
 			if (piece == pieces::Pawn) {
 				int move[2] = { -1, 1 };
-				if (b.cBoard[f + move[WhiteTurn]][r].type == 0){
-					if (WhiteTurn)b.cBoard[f + move[WhiteTurn]][r].attackers.push_back(ID);
+				if (f + move[WhiteTurn] >= 0 && f + move[WhiteTurn] < 8) {
+					if (b.cBoard[f + move[WhiteTurn]][r].type == 0) {
+						if (WhiteTurn)b.cBoard[f + move[WhiteTurn]][r].attackers.push_back(ID);
+					}
 				}
-				if (unchanged)
-					if (!b.isOccupied(f + 2 * move[WhiteTurn], r)){
-						b.cBoard[f + 2 * move[WhiteTurn]][r].attackers.push_back(ID);
+				if (unchanged) {
+					if (f + 2 * move[WhiteTurn] >= 0 && f + 2 * move[WhiteTurn] < 8) {
+						if (!b.isOccupied(f + 2 * move[WhiteTurn], r)) {
+							b.cBoard[f + 2 * move[WhiteTurn]][r].attackers.push_back(ID);
+						}
 					}
+				}
 				for (int i = 0; i < 2; i++) {
-					if (b.cBoard[f + move[WhiteTurn]][r + move[i]].type != 0) {
-						if (WhiteTurn) {
-							if (b.PieceTeam(f + move[WhiteTurn], r + move[i]) == 2) {
-								//b.cBoard[sTile.f + act[WhiteTurn]][sTile.r + act[i]].p1target = true;
-							}
+					int file = f + move[WhiteTurn];
+					int rank = r + move[i];
+					if (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
+						if (b.isOccupied(file, rank)) {
+							b.cBoard[file][rank].attackers.push_back(ID);
 						}
-						else {
-							if (b.cBoard[sTile.f + move[WhiteTurn]][sTile.r + move[i]].p1){
-								//b.cBoard[sTile.f + act[WhiteTurn]][sTile.r + act[i]].p2target = true;
+					}
+				}
+			}
+			if (piece == pieces::King) {
+				int move[3] = { 1, 0, -1 };
+				for (int file = 0; file < 3; file++) {
+					for (int rank = 0; rank < 3; rank++) {
+						int mFile = f + move[file];
+						int mRank = r + move[rank];
+						if (!(file == 1 && rank == 1) && mFile < 8 && mFile >= 0 && mRank < 8 && mRank >= 0) 
+						{
+							if (noAttackers(mFile, mRank)) {
+								b.cBoard[mFile][mRank].attackers.push_back(ID);
 							}
 						}
 					}
+				}
+				if (b.CanCastle()) { /*Don't check for this move if both kings 
+					and their respective rooks have been all moved already*/
+					int moveB[2] = { 7, 0 };
+					if (sTile.f == moveB[WhiteTurn] && sTile.r == 4 && b.TileIsUnchanged(sTile.f, sTile.r)) {
+						//O-O
+						if (b.TileIsUnchanged(moveB[WhiteTurn], 7)) {
+							if (!b.isOccupied(moveB[WhiteTurn], 6) && !b.isOccupied(moveB[WhiteTurn], 5) && noAttackers(moveB[WhiteTurn], 6)) {
+								b.cBoard[moveB[WhiteTurn]][6].attackers.push_back(ID);
+							}
+						}
+						//O-O-O
+						if (b.TileIsUnchanged(moveB[WhiteTurn], 0)) {
+							if (!b.isOccupied(moveB[WhiteTurn], 3) && !b.isOccupied(moveB[WhiteTurn], 2) && !b.isOccupied(moveB[WhiteTurn], 1) && noAttackers(moveB[WhiteTurn], 2)) {
+								b.cBoard[moveB[WhiteTurn]][2].attackers.push_back(ID);
+							}
+						}
+					}
+				}
+			}
+			if (piece == pieces::Queen) {
+				bool dir[8] = { 1,1,1,1,1,1,1,1 };//n, ne, e, se, s, sw, w, nw
+				int move[8][2] = { {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1}, {0,-1}, {1,-1} };
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						if (dir[j]) {
+							int file = f + move[j][0] * i;
+							int rank = r + move[j][1] * i;
+							if (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
+								if (!b.isOccupied(file, rank)) {
+									b.cBoard[file][rank].attackers.push_back(ID);
+								}
+								else dir[j] = false;
+							}
+							else dir[j] = false;
+						}
+						if (!(dir[0] && dir[1] && dir[2] && dir[3] && dir[4] && dir[5] && dir[6] && dir[7]))break;
+					}
+					if (!(dir[0] && dir[1] && dir[2] && dir[3] && dir[4] && dir[5] && dir[6] && dir[7]))break;
+				}
+			}
+			if (piece == pieces::Rook) {
+				bool dir[4] = { 1,1,1,1,};//n, e, s, w
+				int move[4][2] = { {1,0}, {0,1}, {-1,0}, {0,-1} };
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 4; j++) {
+						if (dir[j]) {
+							int file = f + move[j][0] * i;
+							int rank = r + move[j][1] * i;
+							if (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
+								if (!b.isOccupied(file, rank)) {
+									b.cBoard[file][rank].attackers.push_back(ID);
+								}
+								else dir[j] = false;
+							}
+							else dir[j] = false;
+						}
+						if (!(dir[0] && dir[1] && dir[2] && dir[3]))break;
+					}
+					if (!(dir[0] && dir[1] && dir[2] && dir[3]))break;
+				}
+			}
+			if (piece == pieces::Knight) {
+				int move[8][2] = { {2,-1}, {2,1}, {1,2}, {-1,2}, {-2,-1}, {-2,1}, {1,-2}, {-1,-2} };
+				for (int j = 0; j < 8; j++) {
+					int file = f + move[j][0];
+					int rank = r + move[j][1];
+					if (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
+						if (!b.isOccupied(file, rank)) {
+							b.cBoard[file][rank].attackers.push_back(ID);
+						}
+					}
+				}
+			}
+			if (piece == pieces::Bishop) {
+				bool dir[4] = { 1,1,1,1 };//ne, se, sw, nw
+				int move[4][2] = { {1,1}, {-1,1}, {-1,-1},  {1,-1} };
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 4; j++) {
+						if (dir[j]) {
+							int file = f + move[j][0] * i;
+							int rank = r + move[j][1] * i;
+							if (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
+								if (!b.isOccupied(file, rank)) {
+									b.cBoard[file][rank].attackers.push_back(ID);
+								}
+								else dir[j] = false;
+							}
+							else dir[j] = false;
+						}
+						if (!(dir[0] && dir[1] && dir[2] && dir[3]))break;
+					}
+					if (!(dir[0] && dir[1] && dir[2] && dir[3]))break;
 				}
 			}
 		}
 	}
 }
 
+bool interactions::noAttackers(int f, int r) {
+	if (WhiteTurn) {
+		for (int i = 0; i < b.cBoard[f][r].attackers.size(); i++) {
+			if (b.cBoard[f][r].attackers[i] >= 25)return false;
+		}
+	}
+	else {
+		for (int i = 0; i < b.cBoard[f][r].attackers.size(); i++) {
+			if (b.cBoard[f][r].attackers[i] < 25)return false;
+		}
+	}
+	return true;
+}
 
 //void interactions::chkvalidMove(int type)
 //{
