@@ -8,10 +8,10 @@ Shall be Local PvP rather than PvE
 - Initial Generation of Chess Board  
 - Rendering of Chessboard  
 - Asking The player to select a piece
-  
+- Calculating which tiles are dangerous (for king)  
+- Calculating where pieces can move    
+
 ### In Progress:
-- Calculating which tiles are dangerous (for king)
-- Calculating where pieces can move  
 - Moving Pieces and Cycling through turns  
   
 ### Possible Future Features:  
