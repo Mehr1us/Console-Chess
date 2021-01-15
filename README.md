@@ -13,6 +13,9 @@ Shall be Local PvP rather than PvE
 
 ### In Progress:
 - Moving Pieces and Cycling through turns  
+- Pinning Pieces
+- Putting King in Check
+- Checkmate
   
 ### Possible Future Features:  
 - Logging all moves into a log (perhaps writing to txt file and/or displaying onscreen)
