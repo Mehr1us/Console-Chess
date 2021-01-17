@@ -3,6 +3,10 @@
 #include <iostream>
 #include <fstream> 
 
+bool isEven(int x) {
+	return (x % 2 == 0);
+}
+
 void Log::print() {
 	//spit out moves done onto a txt file
 
@@ -70,7 +74,8 @@ void Log::print() {
 	outfile.open(logName, std::ofstream::out | std::ofstream::trunc);
 
 	for (int i = 0; i < L.log.size(); i += 2) {
-		outfile << L.log[i] << " " << L.log[i + 1] << std::endl;
+		outfile << L.log[i] << " ";
+		if (isEven(L.log.size()) && L.log.size() > 0)outfile << L.log[i + 1] << std::endl;
 	}
 
 	outfile.close();
@@ -78,5 +83,6 @@ void Log::print() {
 
 //to-do add move to log translation
 void Log::logMove(Tile s, Tile t, bool WhiteMove) {
+	//Tile = {file, rank}
 
 }

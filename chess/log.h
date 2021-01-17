@@ -6,6 +6,7 @@ struct Tile;
 
 class Log
 {
+public:
 	std::vector<std::string>log;
 	void print();
 	void logMove(Tile s, Tile t, bool WhiteMove);

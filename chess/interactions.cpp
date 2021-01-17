@@ -84,12 +84,28 @@ void interactions::askForTarget() {
 }
 
 void interactions::move() {
+	L.logMove(sTile, tTile, WhiteTurn);
 	//sTile is co-ords for selected tile
 	//tTile is co-ords for where it's moving
 	int ID = b.cBoard[sTile.f][sTile.r].id;
+	b.cBoard[sTile.f][sTile.r].id = 0;
+	b.cBoard[tTile.f][tTile.r].id = ID;
+	b.cBoard[sTile.f][sTile.r].type = 0;
 	b.cBoard[sTile.f][sTile.r].unchanged = false;
 	b.cBoard[tTile.f][tTile.r].unchanged = false;
-
+	b.cBoard[sTile.f][sTile.r].p1 = false;
+	b.cBoard[sTile.f][sTile.r].p2 = false;
+	if (WhiteTurn) {
+		b.cBoard[tTile.f][tTile.r].p1 = true;
+		b.cBoard[tTile.f][tTile.r].p2 = false;
+		WhiteTurn = false;
+	}
+	else {
+		b.cBoard[tTile.f][tTile.r].p1 = false;
+		b.cBoard[tTile.f][tTile.r].p2 = true;
+		WhiteTurn = true;
+	}
+	b.render(0);
 }
 
 bool interactions::isInPMVector() {
