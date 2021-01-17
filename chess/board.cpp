@@ -1,5 +1,6 @@
 #include "main.h"
 interactions inter;
+Log L;
 
 board::board() {
 	for (int rank = 0; rank < 8; rank++) {
@@ -72,6 +73,7 @@ void board::render(int preview) {
 	std::cout << std::endl << "white pieces {p, K, Q, r, k, b}\np = pawn, K = King, Q = Queen, r = rook, k = knight, b = bishop\n\n";
 	std::cout << "black pieces {i, @, W, n, h, I}\ni = pawn, @ = King, W = Queen, n = rook, h = knight, I = bishop\n\n\n";
 	std::cout << out;
+	inter.calcTargets();
 	if(preview == 0)inter.askForInput();
 	if (flip)flip = false;
 	else flip = true;

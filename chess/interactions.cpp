@@ -1,5 +1,11 @@
 #include "main.h"
 
+bool interactions::isInvalid(int f, int r) {
+	if (!b.isOccupied(f, r))return true;
+	if (WhiteTurn && b.cBoard[f][r].p2 || !WhiteTurn && b.cBoard[f][r].p1)return true;
+	return false;
+}
+
 void interactions::askForInput() {
 	if (WhiteTurn)
 		std::cout << "\nIt's White's turn" << std::endl;
@@ -19,14 +25,80 @@ void interactions::askForInput() {
 			std::cout << "Invalid input for rank!" << std::endl;
 	}
 	std::cout << "File " << sTile.f << " and Rank " << sTile.r << " selected!" << std::endl;
-	chkvalidMove(b.cBoard[sTile.f][sTile.r].type);
 	///////////////////////////////////////////////////////////////////////////////
-	
+	calcPossibleMoves();
 	return;
 }
 
-void interactions::askForTarget() {
+void interactions::calcPossibleMoves() {
+	int f = sTile.f;
+	int r = sTile.r;
+	int ID = b.cBoard[f][r].id;
 
+	for (int file = 0; file < 8; file++) {
+		for (int rank = 0; rank < 8; rank++) {
+			for (int i = 0; i < b.cBoard[file][rank].attackers.size(); i++) {
+				if (b.cBoard[file][rank].attackers[i] == ID && canMove(file, rank)) {
+					possibleMoves.push_back({ file,rank });
+					break;
+				}
+			}
+		}
+	}
+	if (isInvalid(f,r)) {
+		std::cout << "Invalid Tile Selected" << std::endl;
+		b.waitSec();
+		b.render(0);
+		return;
+	}
+	else if (possibleMoves.size() == 0) {
+		std::cout << "Selected piece has no possible moves!" << std::endl;
+		b.waitSec();
+		b.render(0);
+		return;
+	}
+	for (int i = 0; i < 5; i++) {
+		b.render(true);
+	}
+	askForTarget();
+}
+
+void interactions::askForTarget() {
+	while (true) {
+		std::cout << "\nSelect target tile" << std::endl;
+		char input[3] = "a0";
+		std::cin >> input;
+		if (input[0] >= 65 && input[0] <= 72)input[0] += 32;
+		tTile.r = int(input[0]) - 97;
+		tTile.f = int(input[1]) - 49;
+		if (!isInPMVector()) {
+			std::cout << "Invalid move for selected piece!" << std::endl;
+		}
+		else if (sTile.f >= 0 && sTile.f <= 8 && sTile.r >= 0 && sTile.r <= 8)break;
+		else if (!(sTile.f >= 1 && sTile.f <= 8))
+			std::cout << "Invalid input for file!" << std::endl;
+		else if (!(sTile.r >= 1 && sTile.r <= 8))
+			std::cout << "Invalid input for rank!" << std::endl;
+	}
+	move();
+}
+
+void interactions::move() {
+	//sTile is co-ords for selected tile
+	//tTile is co-ords for where it's moving
+	int ID = b.cBoard[sTile.f][sTile.r].id;
+	b.cBoard[sTile.f][sTile.r].unchanged = false;
+	b.cBoard[tTile.f][tTile.r].unchanged = false;
+
+}
+
+bool interactions::isInPMVector() {
+	int f = tTile.f;
+	int r = tTile.r;
+	for (int i = 0; i < possibleMoves.size(); i++) {
+		if (possibleMoves[i].f == f && possibleMoves[i].r == r)return true;
+	}
+	return false;
 }
 
 void interactions::calcTargets() {
@@ -35,6 +107,8 @@ void interactions::calcTargets() {
 			b.cBoard[f][r].attackers.clear();
 		}
 	}
+
+	//goes through all pieces and marks the ones they can move/attack on/to (subject to change)
 	for (int f = 0; f < 8; f++) {
 		for (int r = 0; r < 8; r++) {
 			int ID = b.cBoard[f][r].id;
@@ -59,15 +133,13 @@ void interactions::calcTargets() {
 			if (piece == pieces::Pawn) {
 				int move[2] = { -1, 1 };
 				if (f + move[WhiteTurn] >= 0 && f + move[WhiteTurn] < 8) {
-					if (b.cBoard[f + move[WhiteTurn]][r].type == 0) {
+					if (!b.isOccupied(f + move[WhiteTurn], r)) {
 						if (WhiteTurn)b.cBoard[f + move[WhiteTurn]][r].attackers.push_back(ID);
 					}
 				}
-				if (unchanged) {
-					if (f + 2 * move[WhiteTurn] >= 0 && f + 2 * move[WhiteTurn] < 8) {
-						if (!b.isOccupied(f + 2 * move[WhiteTurn], r)) {
-							b.cBoard[f + 2 * move[WhiteTurn]][r].attackers.push_back(ID);
-						}
+				if (unchanged && f + 2 * move[WhiteTurn] >= 0 && f + 2 * move[WhiteTurn] < 8) {
+					if (!b.isOccupied(f + 2 * move[WhiteTurn], r)) {
+						b.cBoard[f + 2 * move[WhiteTurn]][r].attackers.push_back(ID);
 					}
 				}
 				for (int i = 0; i < 2; i++) {
@@ -190,6 +262,20 @@ void interactions::calcTargets() {
 			}
 		}
 	}
+}
+
+bool interactions::canMove(int f, int r) {
+	if (WhiteTurn) {
+		if (b.cBoard[f][r].p2 || !b.isOccupied(f, r)) {
+			return true;
+		}
+	}
+	else {
+		if (b.cBoard[f][r].p1 || !b.isOccupied(f, r)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 bool interactions::noAttackers(int f, int r) {

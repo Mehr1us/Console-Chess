@@ -1,4 +1,5 @@
-
+#include <stdlib.h>
+#include <vector>
 struct Tile;
 
 class interactions
@@ -6,12 +7,18 @@ class interactions
 public:
 	bool WhiteTurn = true; // true = white's move, false = black's move
 	Tile sTile;
+	Tile tTile;
+	std::vector<Tile>possibleMoves;
 	bool selected = false;
 	void askForInput(); //asks for player to select a piece
-	void chkvalidMove(int type); //checks which positions the selected piece can move to
 	void askForTarget(); //asks for player to input detination for the selected piece
-	void calcTargets();
-	bool noAttackers(int f, int r);
+	void move(); 
+	void calcTargets(); //recalculates the positions that pieces can move to
+	void calcPossibleMoves();
+	bool noAttackers(int f, int r); //returns true if the given Tile has no ids from the opposing team in attackers<>
+	bool canMove(int f, int r);
+	bool isInvalid(int f, int r);
+	bool isInPMVector();
 	//
 };
 

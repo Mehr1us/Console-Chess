@@ -8,3 +8,4 @@
 
 #include "board.h"
 #include "interactions.h"
+#include "log.h"
