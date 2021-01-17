@@ -9,10 +9,11 @@ Shall be Local PvP rather than PvE
 - Rendering of Chessboard  
 - Asking The player to select a piece
 - Calculating which tiles are dangerous (for king)  
-- Calculating where pieces can move    
+- Calculating where pieces can move  
+- Moving Pieces (*sort of*)  
 
 ### In Progress:
-- Moving Pieces and Cycling through turns  
+- Cycling through turns  
 - Pinning Pieces
 - Putting King in Check
 - Checkmate
