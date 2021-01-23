@@ -62,7 +62,7 @@ void Log::print() {
 				temp += raw[i];
 			}
 		}
-		logName == temp;
+		logName = temp;
 		logName += ".txt";
 
 	std::ofstream outfile(logName);
@@ -75,7 +75,8 @@ void Log::print() {
 
 	for (int i = 0; i < L.log.size(); i += 2) {
 		outfile << L.log[i] << " ";
-		if (isEven(L.log.size()) && L.log.size() > 0)outfile << L.log[i + 1] << std::endl;
+		int temp = i + 1;
+		if (isEven(L.log.size()) && L.log.size() > 0)outfile << L.log[temp] << std::endl;
 	}
 
 	outfile.close();

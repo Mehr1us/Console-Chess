@@ -1,10 +1,5 @@
 #include "main.h"
 
-// Current Problems:
-// - selecting isn't working correctly (e.g. selecting d2 selects e2)
-// - targeting system isn't working correctly either :/
-// - targetting system outright only does white side despite the bool WhiteTurn switching
-//
 
 bool interactions::isInvalid(int f, int r) {
 	if (!b.isOccupied(f, r))return true;

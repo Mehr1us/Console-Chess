@@ -58,12 +58,10 @@ void board::render(int preview) {
 		out += "\t| ";
 		for (int rank = 7; rank >= 0; rank--) {
 			if (cBoard[file][rank].p1) {
-				/*if (flip && preview && cBoard[file][rank].target) out += char(219);
-				else out += charmap[cBoard[file][rank].type]; */
+				out += charmap[cBoard[file][rank].type];
 			}
 			else { 
-				/*if (flip && preview && cBoard[file][rank].target) out += char(219);
-				else out += charmapB[cBoard[file][rank].type]; */
+				out += charmapB[cBoard[file][rank].type];
 			}
 			out += " ";
 		}

@@ -6,8 +6,8 @@ class interactions
 {
 public:
 	bool WhiteTurn = true; // true = white's move, false = black's move
-	Tile sTile;
-	Tile tTile;
+	Tile sTile = { 0,0 };
+	Tile tTile = { 0,0 };
 	std::vector<Tile>possibleMoves;
 	bool selected = false;
 	void askForInput(); //asks for player to select a piece

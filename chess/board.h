@@ -8,7 +8,7 @@ struct bTile {
 	bool p1 = false; // white
 	bool p2 = false; // black
 	bool unchanged = true;
-	int id;
+	int id = 0;
 	std::vector<int>attackers;
 };
 
